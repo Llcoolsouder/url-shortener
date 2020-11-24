@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    volumes:
+      - "/etc/ssl/:/etc/ssl/"
+    ports:
+      - "80:80"
+  app:
+    # Note: Hardcoding the container name makes this less scalable currently
+    container_name: url-shortener_app
+    build:
+      context: .
+      dockerfile: app.dockerfile
+    expose:
+      - 5000
