@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: nginx.dockerfile
-    volumes:
-      - "/etc/ssl/:/etc/ssl/"
     ports:
       - "80:80"
   app:
