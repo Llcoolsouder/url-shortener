@@ -4,19 +4,22 @@ from flask import (
     Flask,
     Blueprint,
     url_for,
-    request
+    request,
+    redirect
 )
 
 
 app = Flask('url-shortener')
 api = Blueprint('api', __name__)
-database = 'links.db'
-conn = sqlite3.connect(database)
+
+DATABASE = 'links.db'
+TABLE = 'links'
+conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS links (
-        source text,
-        destination text)
+cursor.execute(f'''
+    CREATE TABLE IF NOT EXISTS {TABLE} (
+        url text,
+        source_tag text)
 ''')
 conn.commit()
 conn.close()
@@ -27,15 +30,15 @@ def shorten():
     '''
     Creates a shortened url that links to the url given via form
     '''
-    source = request.form['url']
-    destination_tag = hashlib.md5(source.encode('utf-8')).hexdigest()[0:8]
-    destination = url_for('api.short', tag=destination_tag)
-    connection = sqlite3.connect(database)
+    url = request.form['url']
+    source_tag = hashlib.md5(url.encode('utf-8')).hexdigest()[0:8]
+    shortened_url = url_for('api.short', tag=source_tag)
+    connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
-    cursor.execute(f"INSERT INTO links VALUES ('{source}', '{destination_tag}')")
+    cursor.execute(f"INSERT INTO {TABLE} VALUES ('{url}', '{source_tag}')")
     connection.commit()
     connection.close()
-    return f'<a href={destination}>{destination}</a> now redirects to {source}'
+    return f'<a href={shortened_url}>{shortened_url}</a> now redirects to {url}'
 
 
 @api.route('/short/<tag>/')
@@ -45,7 +48,14 @@ def short(tag):
     Parameters:
         tag (str): unique piece of shortened url
     '''
-    return 'This endpoint has not been implemented.'
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT url FROM {TABLE} WHERE source_tag = '{tag}'")
+    url = cursor.fetchone()[0]
+    connection.close()
+    if 'http' not in url:
+        url = f'http://{url}'
+    return redirect(url)
 
 
 app.register_blueprint(api, url_prefix='/api')
