@@ -38,7 +38,7 @@ def shorten():
     cursor.execute(f"INSERT INTO {TABLE} VALUES ('{url}', '{source_tag}')")
     connection.commit()
     connection.close()
-    return f'<a href={shortened_url}>{shortened_url}</a> now redirects to {url}'
+    return f'<a href={shortened_url}>{shortened_url}</a> redirects to {url}'
 
 
 @api.route('/short/<tag>/')
