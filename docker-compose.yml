@@ -12,5 +12,7 @@ services:
     build:
       context: .
       dockerfile: app.dockerfile
+    volumes:
+      - ./database/:/database/
     expose:
       - 5000

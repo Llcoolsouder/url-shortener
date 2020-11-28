@@ -12,7 +12,7 @@ from flask import (
 app = Flask('url-shortener')
 api = Blueprint('api', __name__)
 
-DATABASE = 'links.db'
+DATABASE = 'database/links.db'
 TABLE = 'links'
 conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
