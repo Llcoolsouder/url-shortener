@@ -4,9 +4,11 @@ This is just a small project for practicing some backend web skills. The homepag
 ## My Stack
 - Python3
 - Flask
+- Gunicorn
 - Sqlite3
 - nginx
 - Docker and Docker Compose
+- HTML and CSS
 
 ## Building
 The entire project is set up to run with `docker-compose`, so everything should be very portable and easy to use. To run the server, do the following:

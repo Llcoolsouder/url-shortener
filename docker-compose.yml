@@ -7,12 +7,10 @@ services:
     ports:
       - "80:80"
   app:
-    # Note: Hardcoding the container name makes this less scalable currently
-    container_name: url-shortener_app
     build:
       context: .
       dockerfile: app.dockerfile
     volumes:
-      - ./database/:/database/
+      - ./database/:/backend/database/
     expose:
       - 5000

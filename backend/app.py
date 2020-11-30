@@ -1,5 +1,6 @@
+from link import Link, LinkEncoder
 import sqlite3
-import hashlib
+import json
 from flask import (
     Flask,
     Blueprint,
@@ -30,15 +31,14 @@ def shorten():
     '''
     Creates a shortened url that links to the url given via form
     '''
-    url = request.form['url']
-    source_tag = hashlib.md5(url.encode('utf-8')).hexdigest()[0:8]
-    shortened_url = url_for('api.short', tag=source_tag)
+    link = Link.from_url(request.form['url'])
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
-    cursor.execute(f"INSERT INTO {TABLE} VALUES ('{url}', '{source_tag}')")
+    cursor.execute(
+        f"INSERT INTO {TABLE} VALUES ('{link.url}', '{link.source_tag}')")
     connection.commit()
     connection.close()
-    return f'<a href={shortened_url}>{shortened_url}</a> redirects to {url}'
+    return json.dumps(link, cls=LinkEncoder)
 
 
 @api.route('/short/<tag>/')
@@ -50,16 +50,25 @@ def short(tag):
     '''
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
-    cursor.execute(f"SELECT url FROM {TABLE} WHERE source_tag = '{tag}'")
-    url = cursor.fetchone()[0]
+    cursor.execute(f"SELECT * FROM {TABLE} WHERE source_tag = '{tag}'")
+    link_data = cursor.fetchone()[0]
     connection.close()
-    if 'http' not in url:
-        url = f'http://{url}'
-    return redirect(url)
+    link = Link(*link_data)
+    return redirect(link.get_absolute_url())
+
+
+@api.route('/links/')
+def all():
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+    cursor.execute(f'SELECT * FROM {TABLE}')
+    links = list(map(lambda data: Link(*data), cursor.fetchall()))
+    connection.close()
+    return json.dumps(links, cls=LinkEncoder)
 
 
 app.register_blueprint(api, url_prefix='/api')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)  # TODO: Remove debug mode
+    app.run()
