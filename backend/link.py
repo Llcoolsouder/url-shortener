@@ -27,7 +27,7 @@ class Link():
         '''
         cleaned_url = url
         if url.startswith('http'):
-            cleaned_url = url.split('//')[1:].join('')
+            cleaned_url = ''.join(url.split('//')[1:])
         return cleaned_url
 
 

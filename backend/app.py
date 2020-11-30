@@ -41,22 +41,6 @@ def shorten():
     return json.dumps(link, cls=LinkEncoder)
 
 
-@api.route('/short/<tag>/')
-def short(tag):
-    '''
-    Redirects to the url previously associated with tag
-    Parameters:
-        tag (str): unique piece of shortened url
-    '''
-    connection = sqlite3.connect(DATABASE)
-    cursor = connection.cursor()
-    cursor.execute(f"SELECT * FROM {TABLE} WHERE source_tag = '{tag}'")
-    link_data = cursor.fetchone()[0]
-    connection.close()
-    link = Link(*link_data)
-    return redirect(link.get_absolute_url())
-
-
 @api.route('/links/')
 def all():
     connection = sqlite3.connect(DATABASE)
@@ -68,6 +52,22 @@ def all():
 
 
 app.register_blueprint(api, url_prefix='/api')
+
+
+@app.route('/short/<tag>/')
+def short(tag):
+    '''
+    Redirects to the url previously associated with tag
+    Parameters:
+        tag (str): unique piece of shortened url
+    '''
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM {TABLE} WHERE source_tag = '{tag}'")
+    link_data = cursor.fetchone()
+    connection.close()
+    link = Link(*link_data)
+    return redirect(link.get_absolute_url())
 
 
 if __name__ == '__main__':
