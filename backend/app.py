@@ -8,9 +8,10 @@ from flask import (
     request,
     redirect
 )
-
+from flask_cors import CORS
 
 app = Flask('url-shortener')
+cors = CORS(app, resources={"/api/*": {"origins": "*"}})
 api = Blueprint('api', __name__)
 
 DATABASE = 'database/links.db'
@@ -31,7 +32,7 @@ def shorten():
     '''
     Creates a shortened url that links to the url given via form
     '''
-    link = Link.from_url(request.form['url'])
+    link = Link.from_url(request.json['url'])
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
     cursor.execute(
