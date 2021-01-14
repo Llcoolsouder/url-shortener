@@ -3,10 +3,11 @@ import React from "react";
 class UrlShortener extends React.Component {
   constructor(props) {
     super(props);
-    this.API_URI = "http://localhost:80/api/shorten/";
+    this.API_URI = "/api/shorten/";
 
     this.state = {
       url: "",
+      link: ""
     };
 
     this.updateTextState = this.updateTextState.bind(this);
@@ -23,7 +24,7 @@ class UrlShortener extends React.Component {
       body: JSON.stringify(this.state),
     })
       .then((resp) => resp.json())
-      .then((json) => console.log(json));
+      .then((json) => this.setState({link: json.source_tag}));
   }
 
   updateTextState(event) {
@@ -46,6 +47,7 @@ class UrlShortener extends React.Component {
           />
           <button type="submit">Shorten!</button>
         </form>
+        <div>Your shortened url is: /short/{this.state.link}</div>
       </div>
     );
   }
