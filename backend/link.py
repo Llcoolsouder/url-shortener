@@ -1,5 +1,6 @@
 import hashlib
 from json import JSONEncoder
+from functools import partialmethod
 
 
 class Link():
@@ -32,11 +33,24 @@ class Link():
 
 
 class LinkEncoder(JSONEncoder):
-    def default(self, obj):
+    def default(self, obj, api_prefix=''):
         if isinstance(obj, Link):
             return {
                 'url': obj.url,
-                'source_tag': obj.source_tag,
+                'source_tag': f'{api_prefix}{obj.source_tag}',
             }
         else:
             return super().default(obj)
+
+    @classmethod
+    def make_link_encoder(cls, api_prefix):
+        ''' 
+        Returns:
+            a new class that derives JSONEncoder and overrides the `default` 
+            method to use that of LinkEncoder with a prefixed string in front
+            of source_tag
+        '''
+        return type(
+            f'LinkEncoder_{api_prefix}',
+            (JSONEncoder, ),
+            dict(default=partialmethod(cls.default, api_prefix=api_prefix)))

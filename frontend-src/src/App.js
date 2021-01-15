@@ -47,7 +47,10 @@ class UrlShortener extends React.Component {
           />
           <button type="submit">Shorten!</button>
         </form>
-        <div>Your shortened url is: /short/{this.state.link}</div>
+        <div>
+          Your shortened url is: 
+          <a href={this.state.link}>{this.state.link}</a>
+        </div>
       </div>
     );
   }

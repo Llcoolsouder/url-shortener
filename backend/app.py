@@ -39,7 +39,7 @@ def shorten():
         f"INSERT INTO {TABLE} VALUES ('{link.url}', '{link.source_tag}')")
     connection.commit()
     connection.close()
-    return json.dumps(link, cls=LinkEncoder)
+    return json.dumps(link, cls=LinkEncoder.make_link_encoder('/short/'))
 
 
 @api.route('/links/')
